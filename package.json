@@ -1,0 +1,28 @@
+{
+  "name": "minesweeper-task",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint 'src/**/*.{js}'",
+    "lint:fix": "eslint . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/soola-sys/minesweeper-rss.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/soola-sys/minesweeper-rss/issues"
+  },
+  "homepage": "https://github.com/soola-sys/minesweeper-rss#readme",
+  "dependencies": {
+    "eslint-config-airbnb-base": "^15.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.1.1",
+    "eslint": "^9.1.1",
+    "globals": "^15.0.0"
+  }
+}

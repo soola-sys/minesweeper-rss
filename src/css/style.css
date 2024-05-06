@@ -1,0 +1,102 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
+
+body {
+  font-family: "Roboto", sans-serif;
+  height: 100vh;
+  background: #394457;
+  font-size: 20px;
+}
+.wrapper {
+  min-height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.main {
+    flex: 1 0 auto;
+}
+
+.header {
+    padding: 15px;
+    display: flex;
+    gap: 25px;
+    justify-content: space-between;
+    align-items: center;
+}
+.header__difficulty {
+    display: flex;
+    padding: 0;
+    gap: 10px;
+}
+.board__header {
+    display: flex;
+    font-weight: bold;
+    align-items: center;
+    justify-content: space-between;
+}
+a {
+    text-decoration: none;
+}
+.emoji {
+    font-size: 30px;
+}
+li {
+    list-style: none;
+}
+.game {
+    width: min-content;
+    margin: 32px auto 0;
+    gap: 5px 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.cell {
+    width: 32px;
+    cursor: pointer;
+    height: 32px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 3px;
+    opacity: 1;
+    transition: opacity 0.1s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #0077dd;
+}
+
+.open { 
+    background-color: azure;
+    cursor: default;
+}
+
+.cell:hover {
+    box-shadow: inset 0 0 0 10em rgba(255, 255, 255, 0.3);
+}
+.bombed {
+    visibility: hidden;
+}
+.flags {
+    display: flex;
+    align-items: center;
+}
+.flag_bg {
+    background: url('../assets/32.png') no-repeat;
+    background-position:  0 0;
+    width: 32px;
+    height: 32px;
+    padding-left: 15px;
+}
