@@ -16,6 +16,9 @@ body {
 .main {
     flex: 1 0 auto;
 }
+.hide {
+    display: none;
+}
 
 .header {
     padding: 15px;
@@ -63,31 +66,31 @@ li {
 }
 
 .cell {
-    width: 32px;
+    width: 50px;
     cursor: pointer;
-    height: 32px;
+    height: 50px;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
-    border: 1px solid black;
     border-radius: 4px;
     padding: 3px;
     opacity: 1;
     transition: opacity 0.1s ease;
+    user-select: none;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: #0077dd;
 }
 
-.open { 
-    background-color: azure;
+.cell-opened { 
+    background-color: #fff;
     cursor: default;
 }
 
+.game-over {
+    background-color: red;
+}
 .cell:hover {
     box-shadow: inset 0 0 0 10em rgba(255, 255, 255, 0.3);
-}
-.bombed {
-    visibility: hidden;
 }
 .flags {
     display: flex;
@@ -99,4 +102,28 @@ li {
     width: 32px;
     height: 32px;
     padding-left: 15px;
+}
+.medium {
+    width: 32px;
+    height: 32px;
+}
+.hard {
+    width: 20px;
+    height: 20px;
+}
+
+.end-game {
+    margin-top: 10px;
+    display: flex;
+}
+.mined {
+    background-image: url('.././assets/bomb_icon_2.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+.end-game__message::before {
+    content: url('.././assets/icons-refresh.png');
+    justify-content: center;
+    align-items: center;
+    margin-left: 10px;
 }
