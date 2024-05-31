@@ -80,12 +80,6 @@ li {
     align-items: center;
     background-color: #0077dd;
 }
-
-.cell-opened { 
-    background-color: #fff;
-    cursor: default;
-}
-
 .game-over {
     background-color: red;
 }
@@ -126,4 +120,24 @@ li {
     justify-content: center;
     align-items: center;
     margin-left: 10px;
+}
+.x1 {
+    color: blue;
+}
+.x2 {
+    color: green;
+}
+.x3 {
+    color: red;
+}
+.x4 {
+    color: darkblue;
+}
+.number {
+    font-size: 30px;
+    font-weight: 500;
+}
+.cell-opened {
+    background-color: darkgray;
+    cursor: default;
 }

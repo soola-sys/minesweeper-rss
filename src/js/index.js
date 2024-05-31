@@ -100,25 +100,6 @@ const isValidPos = (i, j, n, m) => {
   return 1;
 };
 
-function checkMine(r , c , target) {
-  let n = gameBoard.length; // row 3
-  let m = gameBoard[0].length; // col 3
-  if (r < 0 || c < 0 || r > n - 1 || c > m - 1) return;
-  if(target.classList.contains('cell-opened')) {
-    return;
-  }
-  target.classList.add('cell-opened');
-
-  checkMine(i - 1, j - 1 , target);
-  checkMine(i - 1, j , target);
-  checkMine(i - 1, j + 1, target);
-  checkMine(i, j - 1 , target);
-  checkMine(i, j + 1,  target);
-  checkMine(i + 1, j - 1, target);
-  checkMine(i + 1, j, target);
-  checkMine(i + 1, j + 1, target);
-}
-
 const renderTheEndMessage = () => {
   const span = createElement({
     tag: "span",
@@ -138,6 +119,15 @@ const renderTheEndMessage = () => {
   });
   board.appendChild(modal);
 };
+
+const winCondition = () => {
+  let cellOpened = Array.from(document.querySelectorAll(".cell"));
+  let res = cellOpened.filter((el) => !el.classList.contains("cell-opened"));
+  console.log(res);
+  if (res.length === mineNumber) {
+    setTimeout(() => {alert("You have won!")}, 500);
+  }
+}
 
 const checkAdjacent = (arr, i, j) => {
   let n = arr.length; // row 3
@@ -162,6 +152,55 @@ const checkAdjacent = (arr, i, j) => {
   return counter;
 };
 
+function checkMine(r , c) {
+  let n = gameBoard.length;
+  let m = gameBoard[0].length; 
+  if (r < 0 || c < 0 || r > n - 1 || c > m - 1) return;
+
+  let curr = minesAndNumbers[r][c];
+  if(curr !== 'x' && curr !== 0) {
+    gameBoard[r][c].textContent = curr.toString();
+    gameBoard[r][c].classList.add('number');
+    gameBoard[r][c].classList.add('cell-opened');
+    gameBoard[r][c].classList.add(`x${curr}`);
+    resArr[r][c].isRevealed = true;
+  } 
+  if(curr !== 'x' && curr === 0) {                   
+    
+    if(gameBoard[r][c].classList.contains('cell-opened')) {
+      return;
+    }
+    gameBoard[r][c].classList.add('cell-opened');
+    checkMine(r - 1, c - 1) 
+    checkMine(r - 1, c)
+    checkMine(r - 1, c + 1)
+    checkMine(r, c - 1)
+    checkMine(r, c + 1)
+    checkMine(r + 1, c - 1)
+    checkMine(r + 1, c)
+    checkMine(r + 1, c + 1)
+  }
+}
+
+function clickCell() {
+  let tile = this;
+  let r = parseInt(tile.dataset.row);
+  let c = parseInt(tile.dataset.column);
+  let currCellState = resArr[r][c];
+  console.log(currCellState);
+  if(currCellState.isMine) {
+    mineArr.forEach((el) => {
+      el.classList.add("mined", "game-over");
+      currCellState.isRevealed = true;
+    });
+    setTimeout(() => alert('You lost!') , 500);
+    board.style.pointerEvents = 'none';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+  }
+  checkMine(r , c);
+  winCondition();
+}
+
+let minesAndNumbers = [];
 let gameBoard = [];
 let resArr = [];
 let mineArr = [];
@@ -170,40 +209,39 @@ let colInit = 10;
 
 // Loop to initialize 2D array elements.
 for (let i = 0; i < rowInit; i++) {
-  gameBoard[i] = [];
+  minesAndNumbers[i] = [];
   for (let j = 0; j < colInit; j++) {
-    gameBoard[i][j] = 0;
+    minesAndNumbers[i][j] = 0;
   }
 }
-let nums = gameBoard.length; // row 3
-let cols = gameBoard[0].length; // col 3
+let nums = minesAndNumbers.length; // row 3
+let cols = minesAndNumbers[0].length; // col 3
 let mineNumber = 10;
 for (let i = 0; i < mineNumber; i++) {
   let randomRow = Math.floor(Math.random() * nums);
   let randomCol = Math.floor(Math.random() * cols);
-  if (gameBoard[randomRow][randomCol] === 0) {
-    gameBoard[randomRow][randomCol] = "x";
+  if (minesAndNumbers[randomRow][randomCol] === 0) {
+    minesAndNumbers[randomRow][randomCol] = "x";
   } else {
     i--;
   }
 }
-console.log("ADDED RANDOM BOMBS", gameBoard);
-
 for (let i = 0; i < nums; i++) {
   resArr.push(Array(cols).fill(i));
 }
-for (let i = 0; i < gameBoard.length; i++) {
-  for (let j = 0; j < gameBoard[i].length; j++) {
-    if (gameBoard[i][j] !== "x") {
-      let res = checkAdjacent(gameBoard, i, j);
-      gameBoard[i][j] = res;
+for (let i = 0; i < minesAndNumbers.length; i++) {
+  for (let j = 0; j < minesAndNumbers[i].length; j++) {
+    if (minesAndNumbers[i][j] !== "x") {
+      let res = checkAdjacent(minesAndNumbers, i, j);
+      minesAndNumbers[i][j] = res;
     }
   }
 }
-gameBoard.forEach((rowData, rowIndex) => {
+minesAndNumbers.forEach((rowData, rowIndex) => {
+  let gameRow = []
   const row = createElement({ tag: "div", classes: ["row"]});
   rowData.forEach((columnData, colIndex) => {
-  const  cell = createElement({ tag: "div", classes: ["cell"] , parentNode: row});
+  const cell = createElement({ tag: "div", classes: ["cell"]});
     if (rowInit === 15 && colInit === 15) {
       cell.classList.add("medium");
     }
@@ -217,47 +255,16 @@ gameBoard.forEach((rowData, rowIndex) => {
       isFlagged: false,
       isRevealed: false,
       isMine: columnData === "x" ? true : false,
-      cellCoords: { row: rowIndex, col: colIndex },
     };
     cell.dataset.row = rowIndex;
     cell.dataset.column = colIndex;
+    cell.addEventListener('click' , clickCell);
+    row.appendChild(cell);
+    gameRow.push(cell);
   });
   gameDiv.appendChild(row);
+  gameBoard.push(gameRow);
 });
-
+console.log(minesAndNumbers);
 board.appendChild(gameDiv);
 document.body.appendChild(wrapperEl);
-console.log("OBJECT", resArr);
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".cell")) return;
-  e.target.classList.add("cell-opened");
-  let row = e.target.dataset.row;
-  let column = e.target.dataset.column;
-  let cellState = resArr[row][column];
-  let currentCell = gameBoard[row][column];
-  if (cellState.isMine) {
-    mineArr.forEach((el) => {
-      el.classList.add("mined", "game-over");
-      cellState.isRevealed = true;
-    });
-    setTimeout(() => {
-      renderTheEndMessage();
-    }, 500);
-    board.style.pointerEvents = "none";
-  }
-  if (!cellState.isMine) {
-    e.target.textContent = currentCell;
-  }
-  let cellOpened = Array.from(document.querySelectorAll(".cell"));
-  let res = cellOpened.filter((el) => !el.classList.contains("cell-opened"));
-  if (res.length === mineNumber) {
-    setTimeout(() => {
-      // renderTheEndMessage();
-      alert("You have won!");
-    }, 500);
-  }
-  if (!cellState.isMine && currentCell === 0) {
-    // checkMine(row , column , e.target);
-    console.log(gameDiv[row][column])
-  }
-});
