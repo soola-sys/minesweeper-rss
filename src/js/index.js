@@ -46,8 +46,8 @@ const menuItems = [
   { class: "difficulty-list__amateur", href: "#", text: "любитель" },
   { class: "difficulty-list__pro", href: "#", text: "профессионал" },
 ];
-
-const header = createElement({ tag: "header", classes: ["header"] });
+const headerInner = createElement({ tag: "div", classes: ["header__inner"] });
+const header = createElement({ tag: "header", classes: ["header"] , children: [headerInner]});
 const logo = createElement({
   tag: "div",
   classes: ["header__logo"],
@@ -64,26 +64,26 @@ const btnTheme = createElement({
   classes: ["settings__theme"],
   text: "Dark",
 });
-const btnSound = createElement({
+const btnTest = createElement({
   tag: "button",
   classes: ["settings__sound"],
-  text: "Sound",
+  text: "Тест",
 });
 const divSettings = createElement({
   tag: "div",
   classes: ["header__settings", "settings"],
-  children: [btnTheme, btnSound],
+  children: [btnTheme, btnTest],
 });
 const ulRes = createHeaderMenu(menuItems);
-header.appendChild(logo);
-header.appendChild(ulRes);
-header.appendChild(divSettings);
-
-const main = createElement({ tag: "main", classes: ["main"], children: [] });
+headerInner.appendChild(logo);
+headerInner.appendChild(ulRes);
+headerInner.appendChild(divSettings);
+const gameDiv = createElement({ tag: "div", classes: ["game"] });
+const main = createElement({ tag: "main", classes: ["main"], children: [gameDiv] });
 const board = createElement({
   tag: "div",
   classes: ["board"],
-  children: [createElement({ tag: "div", classes: ["board__header"] })],
+  children: []
 });
 main.appendChild(board);
 const footer = createElement({ tag: "footer", classes: ["footer"] });
@@ -92,7 +92,7 @@ const wrapperEl = createElement({
   classes: ["wrapper"],
   children: [header, main, footer],
 });
-const gameDiv = createElement({ tag: "div", classes: ["game"] });
+
 // Fill  2d matrix
 
 const isValidPos = (i, j, n, m) => {
@@ -163,17 +163,8 @@ function checkMine(r , c) {
     gameBoard[r][c].classList.add('number');
     gameBoard[r][c].classList.add('cell-opened');
     gameBoard[r][c].classList.add(`x${curr}`);
-    // resArr[r][c].isRevealed = true;
   }
-  // if(curr === 'x') {
-  //   mineArr.forEach((el) => {
-  //     el.classList.add("mined", "game-over");
-  //     // currCellState.isRevealed = true;
-  //   });
-  //   setTimeout(() => alert('You lost!') , 500);
-  //   board.style.pointerEvents = 'none';
-  //   tile.removeEventListener('click' ,clickCell);
-  // } 
+
   if(curr !== 'x' && curr === 0) {                   
     if(gameBoard[r][c].classList.contains('cell-opened')) {
       return;
@@ -188,26 +179,25 @@ function checkMine(r , c) {
     checkMine(r + 1, c)
     checkMine(r + 1, c + 1)
   }
+  if(curr === 'x') {
+    mineArr.forEach((el) => el.classList.add('mined'));
+    gameDiv.style.pointerEvents = 'none';
+    gameBoard[r][c].classList.add('game-over');
+    setTimeout(() => alert('You lost!') , 500);
+  }
   gameBoard[r][c].removeEventListener('click' , clickCell);
 }
-function initBoard (columnClicked  , rowClicked) {
+function initBoard (rowClicked  , columnClicked) {
   for (let i = 0; i < mineNumber; i++) {
-    let randomRow = Math.floor(Math.random() * nums);
-    let randomCol = Math.floor(Math.random() * cols);
-    // if (minesAndNumbers[randomRow][randomCol] !== "x") {
-    //   minesAndNumbers[randomRow][randomCol] = "x";
-    // } else {
-    //   i--;
-    // }
+    let randomRow = Math.floor(Math.random() * 10);
+    let randomCol = Math.floor(Math.random() * 10);
     if(minesAndNumbers[randomRow][randomCol] !== "x" && 
     !(randomRow === rowClicked && randomCol === columnClicked)) { 
-      if(!isNeighbor(rowClicked , columnClicked , randomRow , randomCol)) {
-        minesAndNumbers[randomRow][randomCol] = "x";
-      }
+      minesAndNumbers[randomRow][randomCol] = "x";
+      mineArr.push(gameBoard[randomRow][randomCol]);
+    } else {
+      i--
     }
-  }
-  for (let i = 0; i < nums; i++) {
-    resArr.push(Array(cols).fill(i));
   }
   for (let i = 0; i < minesAndNumbers.length; i++) {
     for (let j = 0; j < minesAndNumbers[i].length; j++) {
@@ -217,14 +207,6 @@ function initBoard (columnClicked  , rowClicked) {
       }
     }
   }
-}
-
-function isNeighbor(rowFirst, colFirst, randomRow, randomCol) {
-  const directions = [
-      [0, 0], [0, 1], [1, 1], [1, 0], [1, -1], 
-      [0, -1], [-1, -1], [-1, 0], [-1, 1]
-  ];
-  return directions.some(([dx, dy]) => rowFirst + dx === randomRow && colFirst + dy === randomCol);
 }
 
 function clickCell() {
@@ -237,19 +219,22 @@ function clickCell() {
     firstClick = false;
   }
   checkMine(r , c);
-  console.log(minesAndNumbers);
+  console.log("Mines board" , minesAndNumbers);
   winCondition(tile);
 }
 
-let minesAndNumbers = [];
-let gameBoard = [];
-let resArr = [];
-let mineArr = [];
-let rowInit = 10;
-let colInit = 10;
-let moves = 0;
-let firstClick = true;
+let moves , firstClick , minesAndNumbers, gameBoard;
+let mineArr , rowInit , colInit;
+const mineNumber = 10;
 
+function startGame() {
+moves = 0;
+firstClick = true;
+minesAndNumbers = [];
+gameBoard = []
+mineArr = []
+rowInit = 10;
+colInit = 10;
 // Loop to initialize 2D array elements.
 for (let i = 0; i < rowInit; i++) {
   minesAndNumbers[i] = [];
@@ -257,21 +242,6 @@ for (let i = 0; i < rowInit; i++) {
     minesAndNumbers[i][j] = 0;
   }
 }
-let nums = minesAndNumbers.length; // row 3
-let cols = minesAndNumbers[0].length; // col 3
-let mineNumber = 10;
-// init Board
-// for (let i = 0; i < nums; i++) {
-//   resArr.push(Array(cols).fill(i));
-// }
-// for (let i = 0; i < minesAndNumbers.length; i++) {
-//   for (let j = 0; j < minesAndNumbers[i].length; j++) {
-//     if (minesAndNumbers[i][j] !== "x") {
-//       let res = checkAdjacent(minesAndNumbers, i, j);
-//       minesAndNumbers[i][j] = res;
-//     }
-//   }
-// }
 minesAndNumbers.forEach((rowData, rowIndex) => {
   let gameRow = []
   const row = createElement({ tag: "div", classes: ["row"]});
@@ -283,14 +253,6 @@ minesAndNumbers.forEach((rowData, rowIndex) => {
     if (rowInit === 25 && colInit === 25) {
       cell.classList.add("hard");
     }
-    // if (columnData === "x") {
-    //   mineArr.push(cell);
-    // }
-    // resArr[rowIndex][colIndex] = {
-    //   isFlagged: false,
-    //   isRevealed: false,
-    //   // isMine: columnData === "x" ? true : false,
-    // };
     cell.dataset.row = rowIndex;
     cell.dataset.column = colIndex;
     cell.addEventListener('click' , clickCell);
@@ -300,6 +262,13 @@ minesAndNumbers.forEach((rowData, rowIndex) => {
   gameDiv.appendChild(row);
   gameBoard.push(gameRow);
 });
-console.log(minesAndNumbers);
-board.appendChild(gameDiv);
+}
+startGame();
 document.body.appendChild(wrapperEl);
+
+btnTest.addEventListener('click' , () => {
+  gameDiv.style.pointerEvents = 'auto';
+  gameDiv.innerHTML = '';
+  startGame()
+});
+

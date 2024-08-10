@@ -1,10 +1,16 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap");
-
+ 
 body {
   font-family: "Roboto", sans-serif;
   height: 100vh;
+
+  margin: 0;
   background: #394457;
   font-size: 20px;
+  overflow-x: hidden;
+}
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 .wrapper {
   min-height: 100%;
@@ -14,32 +20,42 @@ body {
   flex-direction: column;
 }
 .main {
-    flex: 1 0 auto;
+    flex: 1 1 auto;
 }
 .hide {
     display: none;
 }
-
-.header {
-    padding: 15px;
+.header__inner {
     display: flex;
     gap: 25px;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    @media (max-width:615px) {
+          font-size: 15px;
+    }
 }
 .header__difficulty {
     display: flex;
-    padding: 0;
     gap: 10px;
+    padding: 0;
 }
-.board__header {
-    display: flex;
-    font-weight: bold;
-    align-items: center;
-    justify-content: space-between;
+
+@media (max-width:768px) {
+    .header__inner {
+      gap: 10px;
+      justify-content: center;
+    }
 }
+
 a {
     text-decoration: none;
+}
+button {
+    font-size: 16px;
+    padding: 5px 15px;
+    border-radius: 8px;
+    cursor: pointer;
 }
 .emoji {
     font-size: 30px;
@@ -48,7 +64,6 @@ li {
     list-style: none;
 }
 .game {
-    width: min-content;
     margin: 32px auto 0;
     gap: 5px 0;
     display: flex;
@@ -71,7 +86,6 @@ li {
     height: 50px;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
     border-radius: 4px;
-    padding: 3px;
     opacity: 1;
     transition: opacity 0.1s ease;
     user-select: none;
@@ -79,6 +93,11 @@ li {
     justify-content: center;
     align-items: center;
     background-color: #0077dd;
+
+    @media (max-width:615px) {
+          width: 40px;
+          height: 40px;
+    }
 }
 .game-over {
     background-color: red;
