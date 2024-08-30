@@ -47,7 +47,11 @@ const menuItems = [
   { class: "difficulty-list__pro", href: "#", text: "профессионал" },
 ];
 const headerInner = createElement({ tag: "div", classes: ["header__inner"] });
-const header = createElement({ tag: "header", classes: ["header"] , children: [headerInner]});
+const header = createElement({
+  tag: "header",
+  classes: ["header"],
+  children: [headerInner],
+});
 const logo = createElement({
   tag: "div",
   classes: ["header__logo"],
@@ -67,25 +71,41 @@ const btnTheme = createElement({
 const btnTest = createElement({
   tag: "button",
   classes: ["settings__sound"],
-  text: "Тест",
+  text: "New game",
+});
+const timerContainer = createElement({
+  tag: "div",
+  classes: ["settings__timer-container"],
+  text: "",
+  children: [
+    createElement({ text: "⏲️" }),
+    createElement({ tag: "div", classes: ["timer"], text: "00:00" }),
+  ],
+});
+const flagsContainer = createElement({
+  tag: "div",
+  classes: ["settings__flags-container"],
+  text: "",
+  children: [
+    createElement({ text: "🚩" }),
+    createElement({ tag: "div", classes: ["flags"], text: "0" }),
+  ],
 });
 const divSettings = createElement({
   tag: "div",
   classes: ["header__settings", "settings"],
-  children: [btnTheme, btnTest],
+  children: [timerContainer, flagsContainer , btnTheme, btnTest],
 });
 const ulRes = createHeaderMenu(menuItems);
 headerInner.appendChild(logo);
 headerInner.appendChild(ulRes);
 headerInner.appendChild(divSettings);
 const gameDiv = createElement({ tag: "div", classes: ["game"] });
-const main = createElement({ tag: "main", classes: ["main"], children: [gameDiv] });
-const board = createElement({
-  tag: "div",
-  classes: ["board"],
-  children: []
+const main = createElement({
+  tag: "main",
+  classes: ["main"],
+  children: [gameDiv],
 });
-main.appendChild(board);
 const footer = createElement({ tag: "footer", classes: ["footer"] });
 const wrapperEl = createElement({
   tag: "div",
@@ -100,7 +120,7 @@ const isValidPos = (i, j, n, m) => {
   return 1;
 };
 
-const renderTheEndMessage = () => { 
+const renderTheEndMessage = () => {
   const span = createElement({
     tag: "span",
     classes: ["end-game__message"],
@@ -110,7 +130,7 @@ const renderTheEndMessage = () => {
     classes: ["end-game"],
     text: "You have lost ,Try again",
     children: [
-       createLinkElement({
+      createLinkElement({
         href: "#",
         classes: ["js-restart-game"],
         children: [span],
@@ -120,13 +140,15 @@ const renderTheEndMessage = () => {
   board.appendChild(modal);
 };
 
-function winCondition (tile) {
-  let currentCell = tile;
+function winCondition() {
   let cellOpened = Array.from(document.querySelectorAll(".cell"));
   let res = cellOpened.filter((el) => !el.classList.contains("cell-opened"));
   if (res.length === mineNumber) {
-    setTimeout(() => {alert("You have won!")}, 500);
-    currentCell.removeEventListener('click', clickCell);
+    clearInterval(timerId);
+    setTimeout(() => {
+      alert("You have won!");
+    }, 500);
+    cellOpened.forEach(endGameTouches);
   }
 }
 
@@ -153,123 +175,191 @@ const checkAdjacent = (arr, i, j) => {
   return counter;
 };
 
-function checkMine(r , c) {
+function checkMine(r, c) {
   let n = gameBoard.length;
-  let m = gameBoard[0].length; 
+  let m = gameBoard[0].length;
   if (r < 0 || c < 0 || r > n - 1 || c > m - 1) return;
   let curr = minesAndNumbers[r][c];
-  if(curr !== 'x' && curr !== 0) {
-    gameBoard[r][c].textContent = curr.toString();
-    gameBoard[r][c].classList.add('number');
-    gameBoard[r][c].classList.add('cell-opened');
-    gameBoard[r][c].classList.add(`x${curr}`);
+  if (curr !== "x" && curr !== 0) {
+      if(gameBoard[r][c].classList.contains("cell-flagged")) {
+        gameBoard[r][c].classList.remove("cell-flagged");
+      }
+      gameBoard[r][c].textContent = curr.toString();
+      gameBoard[r][c].classList.add("number");
+      gameBoard[r][c].classList.add("cell-opened");
+      gameBoard[r][c].classList.add(`x${curr}`);
   }
 
-  if(curr !== 'x' && curr === 0) {                   
-    if(gameBoard[r][c].classList.contains('cell-opened')) {
+  if (curr !== "x" && curr === 0) {
+    if(gameBoard[r][c].classList.contains("cell-flagged")) {
+      gameBoard[r][c].classList.remove("cell-flagged");
+    }
+    if (gameBoard[r][c].classList.contains("cell-opened")) {
       return;
     }
-    gameBoard[r][c].classList.add('cell-opened');
-    checkMine(r - 1, c - 1) 
-    checkMine(r - 1, c)
-    checkMine(r - 1, c + 1)
-    checkMine(r, c - 1)
-    checkMine(r, c + 1)
-    checkMine(r + 1, c - 1)
-    checkMine(r + 1, c)
-    checkMine(r + 1, c + 1)
+    gameBoard[r][c].classList.add("cell-opened");
+    checkMine(r - 1, c - 1);
+    checkMine(r - 1, c);
+    checkMine(r - 1, c + 1);
+    checkMine(r, c - 1);
+    checkMine(r, c + 1);
+    checkMine(r + 1, c - 1);
+    checkMine(r + 1, c);
+    checkMine(r + 1, c + 1);
   }
-  if(curr === 'x') {
-    mineArr.forEach((el) => el.classList.add('mined'));
-    gameDiv.style.pointerEvents = 'none';
-    gameBoard[r][c].classList.add('game-over');
-    setTimeout(() => alert('You lost!') , 500);
+  if (curr === "x") {
+    let AllCells = document.querySelectorAll('.cell');
+    clearInterval(timerId);
+    mineArr.forEach((el) => {
+      if(!el.classList.contains("mined"))
+       el.classList.add("mined");
+      if(el.classList.contains("cell-flagged")) {
+        el.classList.remove("cell-flagged");
+        el.classList.add("game-over-flag");
+      }
+    });
+    gameBoard[r][c].classList.add("game-over");
+    setTimeout(() => {
+      alert('you lost');
+    }, 500);
+    AllCells.forEach(endGameTouches);
+    console.log("MineArr", mineArr);
   }
-  gameBoard[r][c].removeEventListener('click' , clickCell);
+  gameBoard[r][c].removeEventListener("click", clickCell);
 }
-function initBoard (rowClicked  , columnClicked) {
+
+function initBoard(rowClicked, columnClicked) {
   for (let i = 0; i < mineNumber; i++) {
     let randomRow = Math.floor(Math.random() * 10);
     let randomCol = Math.floor(Math.random() * 10);
-    if(minesAndNumbers[randomRow][randomCol] !== "x" && 
-    !(randomRow === rowClicked && randomCol === columnClicked)) { 
+    if (
+      minesAndNumbers[randomRow][randomCol] !== "x" &&
+      !(randomRow === rowClicked && randomCol === columnClicked)
+    ) {
       minesAndNumbers[randomRow][randomCol] = "x";
       mineArr.push(gameBoard[randomRow][randomCol]);
     } else {
-      i--
+      i--;
     }
   }
   for (let i = 0; i < minesAndNumbers.length; i++) {
     for (let j = 0; j < minesAndNumbers[i].length; j++) {
-      if (minesAndNumbers[i][j] !== "x"){
+      if (minesAndNumbers[i][j] !== "x") {
         let res = checkAdjacent(minesAndNumbers, i, j);
         minesAndNumbers[i][j] = res;
-      }  
+      }
     }
   }
 }
+
+function endGameTouches(e) {
+  e.removeEventListener("click", clickCell);
+  e.removeEventListener("contextmenu" , rightClickCell);
+  e.addEventListener('contextmenu', function(event) {
+    event.preventDefault();
+});
+  e.style.opacity = '0.5';
+  console.log('calling.....');
+}   
 
 function clickCell() {
   let tile = this;
   let r = parseInt(tile.dataset.row);
   let c = parseInt(tile.dataset.column);
   moves += 1;
-  if(firstClick) {
-    initBoard(r , c);
+  if (firstClick) {
+    initBoard(r, c);
+    timerId = setInterval(startDurationTimer, 1000);
     firstClick = false;
-  }                            
-  console.log(minesAndNumbers);                                                                                                                                                                                                                                                                                                               
-  checkMine(r , c);
-  console.log("Mines board" , minesAndNumbers);
-  winCondition(tile);
-}
-
-let moves , firstClick , minesAndNumbers, gameBoard;
-let mineArr , rowInit , colInit;
-const mineNumber = 10;
-
-function startGame() {
-moves = 0;
-firstClick = true;
-minesAndNumbers = [];
-gameBoard = []
-mineArr = []
-rowInit = 10;
-colInit = 10;
-// Loop to initialize 2D array elements.
-for (let i = 0; i < rowInit; i++) {
-  minesAndNumbers[i] = [];
-  for (let j = 0; j < colInit; j++) {
-    minesAndNumbers[i][j] = 0;
+  }
+  if(!gameBoard[r][c].classList.contains('cell-flagged')) {
+    console.log(minesAndNumbers);
+    checkMine(r, c);
+    console.log("Mines board", minesAndNumbers);
+    winCondition();
   }
 }
-minesAndNumbers.forEach((rowData, rowIndex) => {
-  let gameRow = []
-  const row = createElement({ tag: "div", classes: ["row"]});
-  rowData.forEach((columnData, colIndex) => {
-  const cell = createElement({ tag: "div", classes: ["cell"]});
-    if (rowInit === 15 && colInit === 15) {
-      cell.classList.add("medium");
+
+function rightClickCell(evt) {
+  evt.preventDefault();
+    if(!evt.target.classList.contains('cell-flagged')) {
+      if(!evt.target.classList.contains('cell-opened')) {
+        evt.target.classList.add('cell-flagged');
+        flagNumber -= 1;
+        document.querySelector('.flags').textContent = `${flagNumber}`;
+      }
     }
-    if (rowInit === 25 && colInit === 25) {
-      cell.classList.add("hard");
+    else if(evt.target.classList.contains('cell-flagged')){
+      evt.target.classList.remove('cell-flagged');
+      flagNumber += 1;
+      document.querySelector('.flags').textContent = `${flagNumber}`;
     }
-    cell.dataset.row = rowIndex;
-    cell.dataset.column =  colIndex;
-    cell.addEventListener('click' , clickCell);
-    row.appendChild(cell);
-    gameRow.push(cell);
-  });
-  gameDiv.appendChild(row);
-  gameBoard.push(gameRow);
-});
 }
+
+let moves, firstClick, minesAndNumbers, gameBoard;
+let mineArr, rowInit, colInit;
+const mineNumber = 10;
+let seconds = 0;
+let timerId;
+let flagNumber;
+
+function startGame() {
+  moves = 0;
+  firstClick = true;
+  minesAndNumbers = [];
+  gameBoard = [];
+  mineArr = [];
+  rowInit = 10;
+  colInit = 10;
+  flagNumber = mineNumber;
+  // Loop to initialize 2D array elements.
+  for (let i = 0; i < rowInit; i++) {
+    minesAndNumbers[i] = [];
+    for (let j = 0; j < colInit; j++) {
+      minesAndNumbers[i][j] = 0;
+    }
+  }
+  minesAndNumbers.forEach((rowData, rowIndex) => {
+    let gameRow = [];
+    const row = createElement({ tag: "div", classes: ["row"] });
+    rowData.forEach((columnData, colIndex) => {
+      const cell = createElement({ tag: "div", classes: ["cell"] });
+      if (rowInit === 15 && colInit === 15) {
+        cell.classList.add("medium");
+      }
+      if (rowInit === 25 && colInit === 25) {
+        cell.classList.add("hard");
+      }
+      cell.dataset.row = rowIndex;
+      cell.dataset.column = colIndex;
+      cell.addEventListener("click", clickCell);
+      cell.addEventListener("contextmenu", rightClickCell);
+      row.appendChild(cell);
+      gameRow.push(cell);
+    });
+    gameDiv.appendChild(row);
+    gameBoard.push(gameRow);
+  });
+}
+
+function startDurationTimer() {
+  seconds += 1;
+  let minutes = Math.floor(seconds / 60);
+  let formattedMinutes = String(minutes).padStart(2 , "0");
+  let formattedSeconds = String(seconds % 60).padStart(2 , "0");
+  document.querySelector('.timer').textContent = `${formattedMinutes}:${formattedSeconds}`;
+}
+
 startGame();
 document.body.appendChild(wrapperEl);
-
-btnTest.addEventListener('click' , () => {
-  gameDiv.style.pointerEvents = 'auto';
-  gameDiv.innerHTML = '';
-  startGame()
+document.querySelector('.flags').textContent = `${flagNumber}`;
+btnTest.addEventListener("click", () => {
+  gameDiv.style.pointerEvents = "auto";
+  gameDiv.innerHTML = "";
+  seconds = 0;
+  flagNumber = mineNumber;
+  document.querySelector('.flags').textContent = `${flagNumber}`;
+  document.querySelector('.timer').textContent = '00:00';
+  clearInterval(timerId);
+  startGame();
 });
-
