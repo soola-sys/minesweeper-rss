@@ -10,6 +10,7 @@ const createHeaderMenu = (menuItems) => {
         createLinkElement({
           href: item.href,
           text: item.text,
+          data: item.data,
           classes: ["difficulty-list__link"],
         }),
       ],
@@ -23,7 +24,7 @@ const createHeaderMenu = (menuItems) => {
 };
 
 const createLinkElement = (options) => {
-  const { text = "", href = "#", classes = [], children = [] } = options;
+  const { text = "", href = "#", classes = [], children = [] , data = "" } = options;
   const element = createElement({
     tag: "a",
     text,
@@ -31,6 +32,7 @@ const createLinkElement = (options) => {
     children,
   });
   element.setAttribute("href", href);
+  element.setAttribute("data-level", data);
   return element;
 };
 
@@ -42,9 +44,9 @@ const createHeaderImg = () => {
 };
 
 const menuItems = [
-  { class: "difficulty-list__beginner", href: "#", text: "новичок" },
-  { class: "difficulty-list__amateur", href: "#", text: "любитель" },
-  { class: "difficulty-list__pro", href: "#", text: "профессионал" },
+  { class: "difficulty-list__beginner", href: "#", text: "новичок", data: "beginner"},
+  { class: "difficulty-list__amateur", href: "#", text: "любитель", data: "amateur"},
+  { class: "difficulty-list__pro", href: "#", text: "профессионал", data: "pro"},
 ];
 const headerInner = createElement({ tag: "div", classes: ["header__inner"] });
 const header = createElement({
@@ -97,9 +99,6 @@ const divSettings = createElement({
   children: [timerContainer, flagsContainer , btnTheme, btnTest],
 });
 const ulRes = createHeaderMenu(menuItems);
-headerInner.appendChild(logo);
-headerInner.appendChild(ulRes);
-headerInner.appendChild(divSettings);
 const gameDiv = createElement({ tag: "div", classes: ["game"] });
 const main = createElement({
   tag: "main",
@@ -107,6 +106,7 @@ const main = createElement({
   children: [gameDiv],
 });
 const footer = createElement({ tag: "footer", classes: ["footer"] });
+
 const wrapperEl = createElement({
   tag: "div",
   classes: ["wrapper"],
@@ -115,7 +115,7 @@ const wrapperEl = createElement({
 
 // Fill  2d matrix
 
-const isValidPos = (i, j, n, m) => {
+const isValidCellPos = (i, j, n, m) => {
   if (i < 0 || j < 0 || i > n - 1 || j > m - 1) return 0;
   return 1;
 };
@@ -152,20 +152,20 @@ function winCondition() {
   }
 }
 
-const checkAdjacent = (arr, i, j) => {
+const checkAdjacentСell = (arr, i, j) => {
   let n = arr.length; // row 3
   let m = arr[0].length; // col 3
   let v = [];
   let counter = 0;
 
-  if (isValidPos(i - 1, j - 1, n, m)) v.push(arr[i - 1][j - 1]); // 1 , 1
-  if (isValidPos(i - 1, j, n, m)) v.push(arr[i - 1][j]); // 1 , 2
-  if (isValidPos(i - 1, j + 1, n, m)) v.push(arr[i - 1][j + 1]); // 1, 3
-  if (isValidPos(i, j - 1, n, m)) v.push(arr[i][j - 1]); // 2, 1
-  if (isValidPos(i, j + 1, n, m)) v.push(arr[i][j + 1]); // 2, 2
-  if (isValidPos(i + 1, j - 1, n, m)) v.push(arr[i + 1][j - 1]); // 2, 3
-  if (isValidPos(i + 1, j, n, m)) v.push(arr[i + 1][j]);
-  if (isValidPos(i + 1, j + 1, n, m)) v.push(arr[i + 1][j + 1]);
+  if (isValidCellPos(i - 1, j - 1, n, m)) v.push(arr[i - 1][j - 1]); // 1 , 1
+  if (isValidCellPos(i - 1, j, n, m)) v.push(arr[i - 1][j]); // 1 , 2
+  if (isValidCellPos(i - 1, j + 1, n, m)) v.push(arr[i - 1][j + 1]); // 1, 3
+  if (isValidCellPos(i, j - 1, n, m)) v.push(arr[i][j - 1]); // 2, 1
+  if (isValidCellPos(i, j + 1, n, m)) v.push(arr[i][j + 1]); // 2, 2
+  if (isValidCellPos(i + 1, j - 1, n, m)) v.push(arr[i + 1][j - 1]); // 2, 3
+  if (isValidCellPos(i + 1, j, n, m)) v.push(arr[i + 1][j]);
+  if (isValidCellPos(i + 1, j + 1, n, m)) v.push(arr[i + 1][j + 1]);
 
   v.forEach((el) => {
     if (el === "x") {
@@ -175,7 +175,7 @@ const checkAdjacent = (arr, i, j) => {
   return counter;
 };
 
-function checkMine(r, c) {
+function checkCellStatus(r, c) {
   let n = gameBoard.length;
   let m = gameBoard[0].length;
   if (r < 0 || c < 0 || r > n - 1 || c > m - 1) return;
@@ -198,14 +198,14 @@ function checkMine(r, c) {
       return;
     }
     gameBoard[r][c].classList.add("cell-opened");
-    checkMine(r - 1, c - 1);
-    checkMine(r - 1, c);
-    checkMine(r - 1, c + 1);
-    checkMine(r, c - 1);
-    checkMine(r, c + 1);
-    checkMine(r + 1, c - 1);
-    checkMine(r + 1, c);
-    checkMine(r + 1, c + 1);
+    checkCellStatus(r - 1, c - 1);
+    checkCellStatus(r - 1, c);
+    checkCellStatus(r - 1, c + 1);
+    checkCellStatus(r, c - 1);
+    checkCellStatus(r, c + 1);
+    checkCellStatus(r + 1, c - 1);
+    checkCellStatus(r + 1, c);
+    checkCellStatus(r + 1, c + 1);
   }
   if (curr === "x") {
     let AllCells = document.querySelectorAll('.cell');
@@ -230,8 +230,8 @@ function checkMine(r, c) {
 
 function initBoard(rowClicked, columnClicked) {
   for (let i = 0; i < mineNumber; i++) {
-    let randomRow = Math.floor(Math.random() * 10);
-    let randomCol = Math.floor(Math.random() * 10);
+    let randomRow = Math.floor(Math.random() * rowInit);
+    let randomCol = Math.floor(Math.random() * colInit);
     if (
       minesAndNumbers[randomRow][randomCol] !== "x" &&
       !(randomRow === rowClicked && randomCol === columnClicked)
@@ -245,7 +245,7 @@ function initBoard(rowClicked, columnClicked) {
   for (let i = 0; i < minesAndNumbers.length; i++) {
     for (let j = 0; j < minesAndNumbers[i].length; j++) {
       if (minesAndNumbers[i][j] !== "x") {
-        let res = checkAdjacent(minesAndNumbers, i, j);
+        let res = checkAdjacentСell(minesAndNumbers, i, j);
         minesAndNumbers[i][j] = res;
       }
     }
@@ -274,7 +274,7 @@ function clickCell() {
   }
   if(!gameBoard[r][c].classList.contains('cell-flagged')) {
     console.log(minesAndNumbers);
-    checkMine(r, c);
+    checkCellStatus(r, c);
     console.log("Mines board", minesAndNumbers);
     winCondition();
   }
@@ -297,11 +297,12 @@ function rightClickCell(evt) {
 }
 
 let moves, firstClick, minesAndNumbers, gameBoard;
-let mineArr, rowInit, colInit;
-const mineNumber = 10;
+let mineArr, rowInit = 10, colInit = 10;
+let mineNumber = 10;
 let seconds = 0;
 let timerId;
 let flagNumber;
+
 
 function startGame() {
   moves = 0;
@@ -309,9 +310,12 @@ function startGame() {
   minesAndNumbers = [];
   gameBoard = [];
   mineArr = [];
-  rowInit = 10;
-  colInit = 10;
   flagNumber = mineNumber;
+  let mineNum = prompt('Please enter mine size from 10 to 99', '');
+  if(mineNum) {
+    mineNumber = mineNum;
+  }
+  document.querySelector('.flags').textContent = `${flagNumber}`;
   // Loop to initialize 2D array elements.
   for (let i = 0; i < rowInit; i++) {
     minesAndNumbers[i] = [];
@@ -350,10 +354,8 @@ function startDurationTimer() {
   document.querySelector('.timer').textContent = `${formattedMinutes}:${formattedSeconds}`;
 }
 
-startGame();
-document.body.appendChild(wrapperEl);
-document.querySelector('.flags').textContent = `${flagNumber}`;
-btnTest.addEventListener("click", () => {
+
+function resetGame() {
   gameDiv.style.pointerEvents = "auto";
   gameDiv.innerHTML = "";
   seconds = 0;
@@ -362,4 +364,46 @@ btnTest.addEventListener("click", () => {
   document.querySelector('.timer').textContent = '00:00';
   clearInterval(timerId);
   startGame();
-});
+}
+
+headerInner.appendChild(logo);
+headerInner.appendChild(ulRes);
+headerInner.appendChild(divSettings);
+document.body.appendChild(wrapperEl);
+startGame();
+document.querySelector('.header__difficulty').addEventListener("click" , (event) => {
+  let current = event.target;
+  if(current && current.classList.contains('difficulty-list__link')) {
+      if(current.dataset.level === "beginner") {
+      mineNumber = 10;
+      rowInit = 10; 
+      colInit = 10;
+      resetGame();
+    }
+    if(current.dataset.level === "amateur") {
+      mineNumber = 40;
+      rowInit = 15, 
+      colInit = 15;
+      resetGame();
+    }
+   if(current.dataset.level === "pro") {
+      mineNumber = 99;
+      rowInit = 25;
+      colInit = 25;
+      resetGame();
+    }
+  };
+   
+})
+btnTest.addEventListener("click", resetGame);
+
+// btnTest.addEventListener("click", () => {
+//   gameDiv.style.pointerEvents = "auto";
+//   gameDiv.innerHTML = "";
+//   seconds = 0;
+//   flagNumber = mineNumber;
+//   document.querySelector('.flags').textContent = `${flagNumber}`;
+//   document.querySelector('.timer').textContent = '00:00';
+//   clearInterval(timerId);
+//   startGame();
+// });
