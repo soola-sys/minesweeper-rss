@@ -232,3 +232,23 @@ li {
     content: '🚩';
     cursor: default;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    color: #0077dd;
+}
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+.caption {
+    color: #54b3d6;
+}
