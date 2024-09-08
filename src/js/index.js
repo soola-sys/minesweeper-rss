@@ -294,9 +294,9 @@ function clickCell() {
     timerId = setInterval(startDurationTimer, 1000);
     firstClick = false;
   }
+  
   soundOn(sounds.click).play();
   if (!gameBoard[r][c].classList.contains("cell-flagged")) {
-    console.log(minesAndNumbers);
     checkMine(r, c);
     console.log("Mines board", minesAndNumbers);
     winCondition();
@@ -411,8 +411,7 @@ function startGame() {
   else {
     tableRecordsArr = []
   }
-  // rowInit = 15;
-  // colInit = 15;
+
   flagNumber = mineNumber;
   // Loop to initialize 2D array elements.
   for (let i = 0; i < rowInit; i++) {
